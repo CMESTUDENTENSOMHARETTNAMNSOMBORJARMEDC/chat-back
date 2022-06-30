@@ -34,9 +34,10 @@ const getUserId = (id) => {
 
 const getSessionId = (id) => {
   io.sockets.sockets.forEach((s) => {
-    if (s.hasOwn(userId) && s.userId === id) return s.id
+    if (s.userId === id) {
+      return s.id
+    }
   })
-  return null
 }
 
 io.use(async (socket, next) => {
@@ -46,8 +47,6 @@ io.use(async (socket, next) => {
       console.log('this ' + s.username)
       console.log('vs ' + username)
       if (s.username == username) {
-        console.log('match ')
-
         return next(new Error('name already exists'))
       }
     })
@@ -99,7 +98,7 @@ io.use((socket, next) => {
   socket.on('private message', async ({ message, recipient }) => {
     const log = {
       from: socket.userId,
-      to: getUserId(recipient),
+      to: recipient,
       message,
       time: Date(),
     }
@@ -132,7 +131,7 @@ io.on('connection', (socket) => {
   socket.on('fetch private room', async ({ from, recipient }) => {
     const messages = await messagesModel.findPrivateMessages(
       socket.userId,
-      getUserId(recipient)
+      recipient
     )
     socket.emit('messages room', messages)
   })
@@ -150,12 +149,19 @@ io.on('connection', (socket) => {
 
   socket.on('fetch private users', ({ other }) => {
     const users = []
-    const userId = getUserId(other)
-    const username = getUserName(other)
-    if (userId && username) {
+    console.log('other is ' + other)
+    let sid = null
+    let username = null
+    io.sockets.sockets.forEach((s) => {
+      if (s.userId === other) {
+        sid = s.id
+        username = s.username
+      }
+    })
+    if (sid && username) {
       users.push({
-        sid: other,
-        id: userId,
+        sid: sid,
+        id: other,
         name: username,
       })
     } else {
@@ -190,13 +196,19 @@ io.on('connection', (socket) => {
         username: socket.username || 'none',
         user_id: socket.userId,
         message: data.message,
-        recipient: getUserId(data.recipient),
+        recipient: data.recipient,
         created_at: Date(),
       }
       messagesModel.addOne(message, true)
-      socket
-        .to(data.recipient)
-        .emit('private message', { ...message, sid: socket.id })
+      let sid = null
+      io.sockets.sockets.forEach((s) => {
+        if (s.userId === data.recipient) {
+          sid = s.id
+        }
+      })
+      if (sid) {
+        socket.to(sid).emit('private message', { ...message, sid: socket.id })
+      }
       socket.emit('message', message)
     }
   })
