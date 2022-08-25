@@ -83,7 +83,7 @@ io.use((socket, next) => {
       from: socket.userId,
       to: recipient,
       message,
-      time: Date(),
+      time: Date.now(),
     }
     try {
       const out = await fs.writeFile(messagelog, JSON.stringify(log), {
@@ -99,7 +99,7 @@ io.use((socket, next) => {
       from: socket.userId,
       to: recipient,
       message,
-      time: Date(),
+      time: Date.now(),
     }
     try {
       const out = await fs.writeFile(pmlog, JSON.stringify(log), { flag: 'a' })
@@ -179,7 +179,7 @@ io.on('connection', (socket) => {
         user_id: socket.userId,
         message: data.message,
         recipient: data.recipient,
-        created_at: Date(),
+        created_at: Date.now(),
       }
       messagesModel.addOne(message)
       socket.to(data.recipient).emit('message', message)
@@ -196,7 +196,7 @@ io.on('connection', (socket) => {
         user_id: socket.userId,
         message: data.message,
         recipient: data.recipient,
-        created_at: Date(),
+        created_at: Date.now(),
       }
       messagesModel.addOne(message, true)
       let sid = null
@@ -246,6 +246,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('join room', async ({ id, password }) => {
+    console.log('trying to join ' + id)
     const roomToJoin = await roomsModel.findOne(id, password)
     if (!roomToJoin.length) {
       socket.emit('wrong password', id)
