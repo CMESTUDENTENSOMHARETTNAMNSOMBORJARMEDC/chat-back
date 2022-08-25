@@ -215,7 +215,7 @@ io.on('connection', (socket) => {
   socket.on('create room', async (data) => {
     console.log('creating room ' + data.name)
     if (data.name !== '') {
-      const newRoom = await roomsModel.addOne({ id: uuidv4(), data })
+      const newRoom = await roomsModel.addOne({ id: uuidv4(), ...data })
       if (newRoom) {
         socket.emit('new room', newRoom)
         socket.broadcast.emit('new room', newRoom)

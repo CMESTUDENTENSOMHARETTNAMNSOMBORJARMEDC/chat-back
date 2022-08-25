@@ -25,8 +25,8 @@ const addOne = async ({ id, name, password }) => {
   try {
     const result = await db('rooms').insert({ id, name, password }, ['id', 'name'])
     return { id: result[0], name, password: password.length > 0 }
-  } catch {
-    console.log('something went wrong')
+  } catch (error){
+    console.log(error)
     return null
   }
 }
