@@ -3,7 +3,7 @@ module.exports = {
   development: {
     client: 'sqlite3',
     connection: {
-      filename: './data/db.sqlite3',
+      filename: './db.sqlite3',
     },
     pool: {
       max:1,
