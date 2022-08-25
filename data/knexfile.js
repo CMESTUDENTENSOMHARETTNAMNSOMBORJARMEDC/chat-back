@@ -1,13 +1,17 @@
-module.exports = {
+const path = require('path')
 
+module.exports = {
   development: {
     client: 'sqlite3',
     connection: {
-      filename: './db.sqlite3',
+      filename: path.join(__dirname, "./db.sqlite3"),
     },
     pool: {
       max:1,
       afterCreate: (conn, cb) => conn.run('PRAGMA foreign_keys = ON', cb),
+    },
+    migrations: {
+      tableName: 'knex_migrations'
     },
   },
 

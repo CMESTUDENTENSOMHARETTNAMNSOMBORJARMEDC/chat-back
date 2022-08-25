@@ -72,7 +72,6 @@ io.use(async (socket, next) => {
   socket.broadcast.emit('user connected', {
     user: { sid: socket.id, id: socket.userId, name: socket.username },
   })
-
   next()
 })
 
