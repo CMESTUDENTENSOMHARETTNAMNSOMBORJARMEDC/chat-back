@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
   return knex.schema.createTable('rooms', (table) => {
-    table.increments('id')
+    table.string('id').primary()
     table.string('name').unique().notNullable()
     table.string('password')
     table.timestamps(true, true)
