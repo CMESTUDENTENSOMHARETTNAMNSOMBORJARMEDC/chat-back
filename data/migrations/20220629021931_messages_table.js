@@ -9,7 +9,7 @@ exports.up = function (knex) {
     table.string('username').notNullable()
     table.string('recipient')
     table.string('message').notNullable()
-    table.timestamps(true, true)
+    table.bigInteger('created_at').notNullable()
     table.foreign('recipient').references('rooms.id').onDelete('CASCADE')
   })
 }
